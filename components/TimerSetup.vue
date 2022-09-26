@@ -32,7 +32,7 @@
                 </label>
             </div>
             <div>
-                <button type="button" @click="sendTime" class="btn btn-primary mt-4">Iniciar ejercicio</button>
+                <button type="button" @click="sendTime" class="btn btn-primary mt-4">Iniciar 🏋</button>
             </div>
         </form>
     </div>

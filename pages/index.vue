@@ -9,7 +9,7 @@
           <div>
             <button v-if="!isRunning" @click="start" class="btn btn-success">Inicio</button>
             <button v-if="isRunning" @click="stop" class="btn btn-warning">Pausa</button>
-            <button @click="reset" class="btn btn-danger">Reinicio</button>
+            <button @click="reset" class="btn btn-danger">Terminar</button>
           </div>
         </div>
       </div>
@@ -20,13 +20,15 @@
 
 <script>
 import bip from '../static/sound.mp3'
+import go from '../static/go.mp3'
 
 export default {
   name: "IndexPage",
   data() {
     return {
       isRunning: false,
-      sound: null,
+      workoutSound: null,
+      restSound: null,
       startWorkout: false,
       workout: {
         minutes: 0,
@@ -43,7 +45,8 @@ export default {
     }
   },
   mounted() {
-    this.sound = new Audio(bip)
+    this.workoutSound = new Audio(go)
+    this.restSound = new Audio(bip)
   },
   computed: {
     prettyTime() {
@@ -65,10 +68,14 @@ export default {
       const workout = this.workoutTime
       const rest = this.restTime
       this.timer = setInterval(() => {
+        if (this.series === 0 && this.workoutTime === 0 && this.restTime === 0) {
+          this.stop()
+          return
+        }
         // Time for workout
         if (this.workoutTime > 0) {
           if (this.workoutTime === workout && this.restTime === rest) {
-            this.sound.play()
+            this.workoutSound.play()
           }
           this.workoutTime--
         }
@@ -76,13 +83,13 @@ export default {
           // Time for rest
           if (this.workoutTime <= 0 && this.restTime > 0) {
             if (this.workoutTime === 0 && this.restTime === rest) {
-              this.sound.play()
+              this.restSound.play()
             }
             this.restTime--
           }
           // New serie
           else {
-            this.series--
+            (this.serie !== 0) ? this.series-- : 0
             this.workoutTime = workout
             this.restTime = rest
           }
