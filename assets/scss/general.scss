@@ -1,0 +1,28 @@
+@use 'variables';
+
+#main{
+    background: variables.$background;
+    color: variables.$primary;
+    text-align: center;
+    min-height: 100vh;
+}
+
+label{
+    text-align-last: center;
+}
+
+.btn-primary{
+    background-color: variables.$primary;
+    border-color: variables.$primary;
+    :hover{
+        background-color: variables.$secondary;
+        border-color: variables.$secondary;
+    }
+}
+
+input[type=number]{
+    font-weight: bold;
+    font-size: 1.5em;
+    text-align: center;
+    color: variables.$primary;
+}
