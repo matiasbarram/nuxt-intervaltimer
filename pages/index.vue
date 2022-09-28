@@ -42,6 +42,8 @@ export default {
       workoutTime: 0,
       restTime: 0,
       timer: null,
+      workingout: true,
+      resting: false,
     }
   },
   mounted() {
@@ -62,47 +64,68 @@ export default {
       let seconds = Math.round((time - minutes) * 60)
       return minutes + ":" + seconds
     },
+    setTime({ workout, rest, series }) {
+      this.workoutTime = (workout.minutes * 60 + workout.seconds)
+      this.restTime = (rest.minutes * 60 + rest.seconds)
+      this.series = series
+      this.startWorkout = true
+    },
+    runWorkout(workout, rest) {
+      if (this.workoutTime > 0) {
+        this.workoutTime--
+        return
+      }
+      this.workingout = false
+      this.resting = true
+      this.restSound.play()
+    },
+    runRest(workout, rest) {
+      if (this.restTime > 0) {
+        this.restTime--
+        return
+      }
+      this.workingout = true
+      this.resting = false
+      if (this.series > 1) {
+        this.workoutSound.play()
+      }
+      this.restTime = rest
+      this.workoutTime = workout
+      this.series--
+    },
 
     start() {
       this.isRunning = true
       const workout = this.workoutTime
       const rest = this.restTime
+      this.workoutSound.play()
       this.timer = setInterval(() => {
-        if (this.series === 0 && this.workoutTime === 0 && this.restTime === 0) {
-          this.stop()
+        if (this.series === 0) {
+          console.log('fin')
+          this.reset()
           return
         }
-        // Time for workout
-        if (this.workoutTime > 0) {
-          if (this.workoutTime === workout && this.restTime === rest) {
-            this.workoutSound.play()
-          }
-          this.workoutTime--
+        if (this.workingout) {
+          console.log('entrenando')
+          this.runWorkout(workout, rest)
+          return
         }
-        else {
-          // Time for rest
-          if (this.workoutTime <= 0 && this.restTime > 0) {
-            if (this.workoutTime === 0 && this.restTime === rest) {
-              this.restSound.play()
-            }
-            this.restTime--
-          }
-          // New serie
-          else {
-            (this.serie !== 0) ? this.series-- : 0
-            this.workoutTime = workout
-            this.restTime = rest
-          }
+        if (this.resting) {
+          console.log('descansando')
+          this.runRest(workout, rest)
+          return
         }
       }, 1000)
     },
+
     stop() {
       this.isRunning = false
       clearInterval(this.timer)
       this.timer = null
     },
     reset() {
-      this.stop()
+      clearInterval(this.timer)
+      this.workingout, this.resting = false
       this.workoutTime, this.restTime, this.series = 0
       this.workout = {
         minutes: 0,
@@ -114,12 +137,6 @@ export default {
       }
       this.startWorkout = false
     },
-    setTime({ workout, rest, series }) {
-      this.workoutTime = (workout.minutes * 60 + workout.seconds)
-      this.restTime = (rest.minutes * 60 + rest.seconds)
-      this.series = series
-      this.startWorkout = true
-    }
   }
 }
 </script>
